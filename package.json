@@ -1,0 +1,25 @@
+{
+  "name": "arrow_game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "editor": "parcel public/editor.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Radcho/arrow_game.git"
+  },
+  "author": "Radcho",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Radcho/arrow_game/issues"
+  },
+  "homepage": "https://github.com/Radcho/arrow_game#readme",
+  "devDependencies": {
+    "sass": "^1.23.7"
+  },
+  "dependencies": {
+    "purecss": "^1.0.1"
+  }
+}
