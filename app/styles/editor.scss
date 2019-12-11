@@ -1,18 +1,33 @@
 @import "./variables.scss";
 
-.pure-menu {
-    background-color: $navbar-bg;
-    &-heading {
-        color: $navbar-text;
-        font-weight: bold;
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .pure-menu {
+        flex: 0 0 auto;
+        background-color: $navbar-bg;
+        &-heading {
+            color: $navbar-text;
+            font-weight: bold;
+        }
+        &-link {
+            color: $navbar-text;
+            &:hover {
+                background-color: $navbar-bg-highlight;
+            }
+            &:focus {
+                background-color: $navbar-bg-pressed;
+            }
+        }
     }
-    &-link {
-        color: $navbar-text;
-        &:hover {
-            background-color: $navbar-bg-highlight;
-        }
-        &:focus {
-            background-color: $navbar-bg-pressed;
-        }
+    .main {
+        flex: 1 1 auto;
+        overflow: hidden;
     }
 }
+
