@@ -7,16 +7,14 @@ let canvas;
 
 function main() {
     canvas = document.querySelector('canvas');
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    const context = canvas.getContext('2d');
+    context.font = "48px Arial";
+    context.fillText('No level', 13, 56);
 }
 
-function resizeCanvas() {
-    let section = document.querySelector('.main');
-    canvas.width = section.clientWidth;
-    canvas.style.width = section.clientWidth + 'px';
-    canvas.height = section.height;
-    canvas.style.height = section.clientHeight + 'px';
+function resizeCanvas(width, height) {
+    canvas.width = width;
+    canvas.style.width = width + 'px';
+    canvas.height = height;
+    canvas.style.height = height + 'px';
 }
-
-

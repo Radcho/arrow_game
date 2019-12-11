@@ -13,7 +13,20 @@
     <nav class="pure-menu pure-menu-horizontal">
         <a href="#" class="pure-menu-heading custom-menu-brand">Arrow Game - Editor</a>
         <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">New</a></li>
+            <li class="pure-menu-item pure-menu-has-children">
+                <a href="#" class="pure-menu-link">New</a>
+                <ul class="pure-menu-children">
+                    <li class="pure-menu-item">
+                        <label for="rows">Rows</label>
+                        <input type="number" name="rows" id="rows" placeholder="Rows">
+                    </li>
+                    <li class="pure-menu-item">
+                        <label for="columns">Columns</label>
+                        <input type="number" name="columns" id="columns" placeholder="Columns">
+                    </li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Create</a></li>
+                </ul>
+            </li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">Load</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">Save</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">Import</a></li>
@@ -21,10 +34,11 @@
         </ul>
     </nav>
     <section class="main">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" width="200px" height="80px"></canvas>
     </section>
 
     <script src="http://localhost:3000/libs/sprites2v.js"></script> <!-- TODO: change in prod -->
+    <script src="http://localhost:3000/libs/menus.js"></script>
     <script src="../app/js/index.js"></script>
 </body>
 </html>

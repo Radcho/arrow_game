@@ -20,14 +20,51 @@ body {
             &:hover {
                 background-color: $navbar-bg-highlight;
             }
-            &:focus {
+            &:focus, &:active {
                 background-color: $navbar-bg-pressed;
+            }
+        }
+        &-active {
+            .pure-menu-link {
+                background-color: $navbar-bg-highlight;
+                &:hover, &:focus, &:active {
+                    background-color: $navbar-bg-pressed;
+                }
+            }
+        }
+        &-children {
+            background-color: $navbar-bg-highlight;
+            color: $navbar-text;
+            .pure-menu-item {
+                display: flex;
+                label {
+                    flex: 1 1 auto;
+                    padding: 0.2em 0.8em 0.2em 0.4em;
+                    vertical-align: middle;
+                }
+                input {
+                    flex: 0 0 auto;
+                    color: black;
+                }
+                a {
+                    flex: 1 1 auto;
+                    text-align: right;
+                }
             }
         }
     }
     .main {
         flex: 1 1 auto;
-        overflow: hidden;
+        display: flex;
+        align-items: center;
+        background-color: $main-bg;
+        canvas {
+            width: 200px;
+            height: 80px;
+            margin: auto;
+            border: 1px solid black;
+            background-color: $canvas-bg;
+        }
     }
 }
 
