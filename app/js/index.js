@@ -25,7 +25,7 @@ function main() {
 }
 
 function getValidatedInput(input) {
-    let value = parseInt(input.value);
+    const value = parseInt(input.value);
     if (value && !isNaN(value) && value > 0 && value <= 15) {
         return value;
     }
@@ -35,8 +35,8 @@ function getValidatedInput(input) {
 
 function attachButtonHandlers() {
     document.getElementById('create').addEventListener('click', () => {
-        let rows = getValidatedInput(document.getElementById('rows'));
-        let columns = getValidatedInput(document.getElementById('columns'));
+        const rows = getValidatedInput(document.getElementById('rows'));
+        const columns = getValidatedInput(document.getElementById('columns'));
         if (rows && columns) {
             playground.createPlayground(rows, columns);
         }
@@ -65,7 +65,7 @@ function changeTool(chosenTool) {
 
 function changeDirection(chosenDirection) {
     direction = chosenDirection;
-    let robot = document.getElementById('robot');
+    const robot = document.getElementById('robot');
     robot.classList.remove('left', 'right', 'up', 'down');
     robot.classList.add(chosenDirection);
 }
@@ -81,6 +81,7 @@ class Playground {
     constructor() {
         this.tiles = [];
         this.activity = null;
+        this.robot = null;
     }
 
     createPlayground(rows, columns) {
@@ -90,7 +91,8 @@ class Playground {
             this.activity.animating = false;
         }
         this.activity = new Activity(canvas, true);
-        this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.find((tile) => tile.sprite === sprite));
+        this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.find((tile) => tile.sprite === sprite) || sprite);
+        this.robot = new Robot(this.activity);
         resizeCanvas(columns * 50, rows * 50);
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < columns; col++) {
@@ -100,7 +102,29 @@ class Playground {
     }
 
     spriteClicked(tile) {
-        tile.changeType();
+        if (!(tile instanceof Tile)) {
+            tile = this.tiles.find((t) => t.sprite.isIn(tile.x, tile.y));
+            if (!tile) {
+                return;
+            }
+        }
+        switch (tool) {
+            case 'walls':
+                tile.changeType(tile.type === 'tile' ? 'wall' : 'tile');
+                break;
+            case 'robot':
+                if (tile instanceof Tile) {
+                    this.robot.moveTo(tile.row, tile.column);
+                }
+                break;
+            case 'finish':
+                const existingFinish = this.tiles.find((t) => t.type === 'finish');
+                if (existingFinish) {
+                    existingFinish.changeType('tile');
+                }
+                tile.changeType('finish');
+                break;
+        }
     }
 }
 
@@ -109,14 +133,32 @@ class Tile {
         this.row = row;
         this.column = column;
         this.activity = activity;
-        this.isWall = false;
-        this.sprite = new Sprite(activity, ['http://localhost:3000/images/tile.png', 'http://localhost:3000/images/wall.png'], 25 + (50 * column), 25 + (50 * row), clickSprite);
+        this.type = 'tile';
+        const images = ['tile', 'wall', 'finish'].map((type) => `http://localhost:3000/images/${type}.png`);
+        this.sprite = new Sprite(activity, images, 25 + (50 * column), 25 + (50 * row), clickSprite);
     }
 
-    changeType() {
-        this.sprite.images.reverse();
-        this.sprite.image = this.sprite.images[0];
-        this.isWall = !this.isWall;
+    changeType(type) {
+        this.type = type;
+        this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`${type}.png`) !== -1);
+    }
+}
+
+class Robot {
+    constructor(activity) {
+        this.activity = activity;
+        const images = ['r', 'l', 'u', 'd'].map((dir) => `http://localhost:3000/images/robot_${dir}.png`);
+        this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
+    }
+
+    changeDirection(dir) {
+        const dirChar = dir.charAt(0);
+        this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`robot_${dirChar}.png`) !== -1);
+    }
+
+    moveTo(row, column) {
+        this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
+        this.sprite.bringToFront();
     }
 }
 
