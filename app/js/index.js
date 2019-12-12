@@ -10,6 +10,9 @@ let canvas;
  */
 let playground;
 
+let direction = 'right';
+let tool = 'walls';
+
 function main() {
     canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -18,6 +21,7 @@ function main() {
     playground = new Playground();
 
     attachButtonHandlers();
+    attachToolbarHandlers();
 }
 
 function getValidatedInput(input) {
@@ -41,6 +45,29 @@ function attachButtonHandlers() {
     document.getElementById('save').addEventListener('click', () => {})
     document.getElementById('import').addEventListener('click', () => {})
     document.getElementById('export').addEventListener('click', () => {})
+}
+
+function attachToolbarHandlers() {
+    document.getElementById('walls').addEventListener('click', () => changeTool('walls'));
+    document.getElementById('finish').addEventListener('click', () => changeTool('finish'));
+    document.getElementById('robot').addEventListener('click', () => changeTool('robot'));
+    document.getElementById('robot-left').addEventListener('click', () => changeDirection('left'));
+    document.getElementById('robot-right').addEventListener('click', () => changeDirection('right'));
+    document.getElementById('robot-up').addEventListener('click', () => changeDirection('up'));
+    document.getElementById('robot-down').addEventListener('click', () => changeDirection('down'));
+}
+
+function changeTool(chosenTool) {
+    tool = chosenTool;
+    document.querySelectorAll('.control').forEach((el) => el.classList.remove('active'));
+    document.getElementById(chosenTool).classList.add('active');
+}
+
+function changeDirection(chosenDirection) {
+    direction = chosenDirection;
+    let robot = document.getElementById('robot');
+    robot.classList.remove('left', 'right', 'up', 'down');
+    robot.classList.add(chosenDirection);
 }
 
 function resizeCanvas(width, height) {
