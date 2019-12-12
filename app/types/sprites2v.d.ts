@@ -8,6 +8,8 @@ declare class Sprite {
     public bottom: number;
     public width: number;
     public height: number;
+    public image: Image;
+    public images: Array<Image>;
 
     constructor(activity: Activity, appearance: ImageSource, x: number, y: number, behavior?: SpriteBehavior);
 
@@ -32,6 +34,16 @@ declare class Sprite {
 }
 
 declare class Activity {
+    public animating: boolean;
+    public enabled: boolean;
+    public onClick: (sprite: Sprite) => void;
+    public onDragTake: (dragging: Sprite) => void;
+    public onDragMove: (dragging: Sprite) => void;
+    public onDragDrop: (dragging: Sprite) => void;
+    public onPaintBackground: (context: CanvasRenderingContext2D) => void;
+    public onPaintForeground: (context: CanvasRenderingContext2D) => void;
+    public onAnimation: () => void;
+
     constructor(canvas: HTMLCanvasElement | string, enabled: boolean);
 
     saveInitialState(): void;
