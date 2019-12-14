@@ -24,20 +24,13 @@ function getValidatedInput(input) {
 }
 
 function attachButtonHandlers() {
+    document.getElementById('load').addEventListener('click', onLoadPressed);
+    document.getElementById('import').addEventListener('click', onImportPressed);
     document.getElementById('create').addEventListener('click', () => {
         const rows = getValidatedInput(document.getElementById('rows'));
         const columns = getValidatedInput(document.getElementById('columns'));
         if (rows && columns) {
             playground.createPlayground(rows, columns);
-        }
-    });
-    document.getElementById('load').addEventListener('click', () => {
-        const name = document.getElementById('load-name').selectedOptions[0].value;
-        if (projects.indexOf(name) !== -1) {
-            axios.get(`/projects/${encodeURIComponent(name)}`).then((response) => {
-                const map = response.data;
-                loadMap(map);
-            });
         }
     });
     document.getElementById('save').addEventListener('click', () => {
@@ -52,18 +45,6 @@ function attachButtonHandlers() {
                 getSavedLevels();
             });
         }
-    });
-    document.getElementById('import').addEventListener('click', () => {
-        const input = document.getElementById('import-file');
-        if (input.onchange === null) {
-            input.onchange = () => {
-                if (input.files.length > 0) {
-                    const file = input.files[0];
-                    readFile(file)
-                }
-            };
-        }
-        input.click();
     });
     document.getElementById('export').addEventListener('click', () => {
         const dl = document.createElement('a');

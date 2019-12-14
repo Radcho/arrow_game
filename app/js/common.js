@@ -10,6 +10,29 @@ let playground;
 
 let projects = [];
 
+function onLoadPressed() {
+    const name = document.getElementById('load-name').selectedOptions[0].value;
+    if (projects.indexOf(name) !== -1) {
+        axios.get(`/projects/${encodeURIComponent(name)}`).then((response) => {
+            const map = response.data;
+            loadMap(map);
+        });
+    }
+}
+
+function onImportPressed() {
+    const input = document.getElementById('import-file');
+    if (input.onchange === null) {
+        input.onchange = () => {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                readFile(file)
+            }
+        };
+    }
+    input.click();
+}
+
 function readFile(file) {
     const fReader = new FileReader();
 
