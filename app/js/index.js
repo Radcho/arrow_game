@@ -50,9 +50,7 @@ function attachButtonHandlers() {
         if (projects.indexOf(name) !== -1) {
             axios.get(`${serverUrl}/projects/${encodeURIComponent(name)}`).then((response) => {
                 const map = response.data;
-                playground.createPlayground(map.rows, map.columns, map.tiles);
-                playground.robot.changeDirection(map.robot.direction);
-                playground.robot.moveTo(map.robot.row, map.robot.column);
+                loadMap(map);
             });
         }
     });
@@ -69,8 +67,44 @@ function attachButtonHandlers() {
             });
         }
     });
-    document.getElementById('import').addEventListener('click', () => {});
-    document.getElementById('export').addEventListener('click', () => {});
+    document.getElementById('import').addEventListener('click', () => {
+        const input = document.getElementById('import-file');
+        if (input.onchange === null) {
+            input.onchange = () => {
+                if (input.files.length > 0) {
+                    const file = input.files[0];
+                    readFile(file)
+                }
+            };
+        }
+        input.click();
+    });
+    document.getElementById('export').addEventListener('click', () => {
+        const dl = document.createElement('a');
+        const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
+        dl.href = json;
+        dl.download = 'level.json';
+        document.body.appendChild(dl);
+        dl.click();
+        document.body.removeChild(dl);
+    });
+}
+
+function readFile(file) {
+    const fReader = new FileReader();
+
+    fReader.onloadend = (event) => {
+        const contents = event.target.result;
+        loadMap(JSON.parse(contents));
+    }
+
+    fReader.readAsText(file);
+}
+
+function loadMap(map) {
+    playground.createPlayground(map.rows, map.columns, map.tiles);
+    playground.robot.changeDirection(map.robot.direction);
+    playground.robot.moveTo(map.robot.row, map.robot.column);
 }
 
 function getSavedLevels() {
@@ -139,6 +173,7 @@ class Playground {
         this.activity = new Activity(canvas, true);
         this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.find((tile) => tile.sprite === sprite) || sprite);
         this.robot = new Robot(this.activity);
+        this.tiles = [];
         resizeCanvas(columns * 50, rows * 50);
         if (tiles) {
             tiles.forEach((tile) => this.tiles.push(new Tile(this.activity, tile.row, tile.column, tile.type)));
