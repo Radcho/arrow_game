@@ -12,7 +12,6 @@ let playground;
 
 let direction = 'right';
 let tool = 'walls';
-let serverUrl = 'http://localhost:3000'; // TODO
 
 let projects = [];
 
@@ -48,7 +47,7 @@ function attachButtonHandlers() {
     document.getElementById('load').addEventListener('click', () => {
         const name = document.getElementById('load-name').selectedOptions[0].value;
         if (projects.indexOf(name) !== -1) {
-            axios.get(`${serverUrl}/projects/${encodeURIComponent(name)}`).then((response) => {
+            axios.get(`/projects/${encodeURIComponent(name)}`).then((response) => {
                 const map = response.data;
                 loadMap(map);
             });
@@ -59,7 +58,7 @@ function attachButtonHandlers() {
         if (name && playground.tiles.length > 0) {
             // TODO: Check if project exists
             const map = playground.toObject();
-            axios.post(`${serverUrl}/projects/save`, {
+            axios.post(`/projects/save`, {
                 name: encodeURIComponent(name),
                 project: map
             }).then(() => {
@@ -108,7 +107,7 @@ function loadMap(map) {
 }
 
 function getSavedLevels() {
-    axios.get(`${serverUrl}/projects`).then((response) => {
+    axios.get(`/projects`).then((response) => {
         projects = [];
         const select = document.getElementById('load-name');
         select.innerHTML = '';
@@ -231,7 +230,7 @@ class Tile {
         this.column = column;
         this.activity = activity;
         this.type = 'tile';
-        const images = ['tile', 'wall', 'finish'].map((type) => `${serverUrl}/images/${type}.png`);
+        const images = ['tile', 'wall', 'finish'].map((type) => `/images/${type}.png`);
         this.sprite = new Sprite(activity, images, 25 + (50 * column), 25 + (50 * row), clickSprite);
         this.changeType(type);
     }
@@ -255,7 +254,7 @@ class Robot {
         this.row = -1;
         this.column = -1;
         this.activity = activity;
-        const images = ['r', 'l', 'u', 'd'].map((dir) => `${serverUrl}/images/robot_${dir}.png`);
+        const images = ['r', 'l', 'u', 'd'].map((dir) => `/images/robot_${dir}.png`);
         this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
         this.direction = 'right';
     }

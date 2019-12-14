@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "editor": "parcel public/editor.html",
-    "start": "node server/index.js"
+    "build:sass": "node-sass app/styles/main.scss -o dist/styles",
+    "watch:sass": "npm run build:sass && npm run build:sass -- -w",
+    "build:js": "babel app -d dist",
+    "watch:js": "babel app -w -d dist -s inline",
+    "build": "npm-run-all -p build:*",
+    "watch": "npm-run-all -p watch:*",
+    "start": "nodemon server/index.js --watch server"
   },
   "repository": {
     "type": "git",
@@ -18,12 +23,17 @@
   },
   "homepage": "https://github.com/Radcho/arrow_game#readme",
   "devDependencies": {
-    "parcel-bundler": "^1.12.4",
-    "sass": "^1.23.7"
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "node-sass": "^4.13.0",
+    "nodemon": "^2.0.1",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "purecss": "^1.0.1"
-  }
+  },
+  "browserslist": "> 0.5%, not IE 11"
 }
