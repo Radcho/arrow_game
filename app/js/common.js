@@ -8,6 +8,8 @@ let canvas;
  */
 let playground;
 
+let firstSolution = null;
+
 let projects = [];
 
 function onLoadPressed() {
@@ -73,6 +75,78 @@ function resizeCanvas(width, height) {
     canvas.style.height = height + 'px';
 }
 
+function solve() {
+    if (playground.robot.row !== -1 && playground.robot.column !== -1 && playground.finish) {
+        // Try to solve without arrows
+        const sandbox = new PlaygroundSandbox();
+    }
+}
+
+function toCoord({ row, column }) {
+    return `${row},${column}`;
+}
+
+function oppositeDirection(dir) {
+    switch (dir) {
+        case 'up':
+            return 'down';
+        case 'down':
+            return 'up';
+        case 'left':
+            return 'right';
+        case 'right':
+            return 'left';
+    }
+}
+
+class PlaygroundSandbox {
+    constructor() {
+        this.robot = new Robot(null, true);
+        this.robot.row = playground.robot.row;
+        this.robot.column = playground.robot.column;
+        this.tiles = new ArrayMap(playground.tiles.valuesArray().map((tile) => [tile.coord, 0]));
+    }
+
+    reset() {
+        this.robot.row = playground.robot.row;
+        this.robot.column = playground.robot.column;
+        this.tiles.forEach((value, key) => this.tiles.set(key, 0));
+    }
+
+    solveWithArrows(arrowsLeft) {
+        // TODO: catch spinning in place
+        while (this.tiles.get(this.robot.coord) < 3) {
+            if (arrowsLeft) {
+                // has arrows to spare
+            } else {
+                console.warn(`robot on ${this.robot.row}-${this.robot.column}`);
+                if (this.robot.isOn(playground.finish)) {
+                    firstSolution = this.tiles;
+                    return true;
+                }
+                const next = this.robot.nextCoord;
+                const nextTile = playground.tiles.get(toCoord(this.robot.nextCoord));
+                if (!nextTile || nextTile.type === 'wall') {
+                    this.robot.turnRight();
+                } else {
+                    this.robot.moveTo(next.row, next.column);
+                    this.tiles.set(this.robot.coord, this.tiles.get(this.robot.coord) + 1)
+                }
+            }
+        }
+
+        return false;
+    }
+
+    spawnCopy() {
+        const sandbox = new PlaygroundSandbox();
+        sandbox.robot.row = this.robot.row;
+        sandbox.robot.column = this.robot.column;
+        sandbox.tiles = this.tiles.clone();
+        return sandbox;
+    }
+}
+
 class Playground {
     constructor() {
         this.activity = null;
@@ -80,10 +154,6 @@ class Playground {
         this.rows = 0;
         this.columns = 0;
         this.tiles = new ArrayMap();
-    }
-
-    get tileArray() {
-        return Array
     }
 
     createPlayground(rows, columns, tiles) {
@@ -108,6 +178,10 @@ class Playground {
                 }
             }
         }
+    }
+
+    get finish() {
+        return this.tiles.valuesArray().find((tile) => tile.type === 'finish');
     }
 
     spriteClicked(tile) {
@@ -137,38 +211,90 @@ class Tile {
 }
 
 class Robot {
-    constructor(activity) {
+    constructor(activity, shadow = false) {
         this.row = -1;
         this.column = -1;
         this.activity = activity;
-        const images = ['r', 'l', 'u', 'd'].map((dir) => `/images/robot_${dir}.png`);
-        this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
+        this.shadow = shadow;
+        if (!shadow) {
+            const images = ['r', 'l', 'u', 'd'].map((dir) => `/images/robot_${dir}.png`);
+            this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
+        }
         this.direction = 'right';
+    }
+
+    get coord() {
+        return `${this.row},${this.column}`;
+    }
+
+    isOn(tile) {
+        return this.row === tile.row && this.column === tile.column;
     }
 
     changeDirection(dir) {
         this.direction = dir;
-        const dirChar = dir.charAt(0);
-        this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`robot_${dirChar}.png`) !== -1);
+        if (!this.shadow) {
+            const dirChar = dir.charAt(0);
+            this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`robot_${dirChar}.png`) !== -1);
+        }
     }
 
     moveTo(row, column) {
         this.row = row;
         this.column = column;
-        this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
-        this.sprite.bringToFront();
+        if (!this.shadow) {
+            this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
+            this.sprite.bringToFront();
+        }
+    }
+
+    turnRight() {
+        switch (this.direction) {
+            case 'up':
+                this.direction = 'right';
+                break;
+            case 'down':
+                this.direction = 'left';
+                break;
+            case 'left':
+                this.direction = 'up';
+                break;
+            case 'right':
+                this.direction = 'down';
+                break;
+        }
+    }
+
+    getCoordFromDirection(dir) {
+        const column = this.column + (dir === 'right') - (dir === 'left');
+        const row = this.row + (dir === 'down') - (dir === 'up');
+        return {
+            row,
+            column
+        };
+    }
+
+    get possibleDirections() {
+        return ['left', 'right', 'up', 'down']
+            .filter((dir) => dir !== oppositeDirection(this.direction))
+            .map((dir) => toCoord(this.getCoordFromDirection(dir)))
+            .filter((coord) => playground.tiles.get(coord) && playground.tiles.get(coord).type !== 'wall');
     }
 
     get nextCoord() {
-        const col = this.column + (this.direction === 'right') - (this.direction === 'left');
-        const row = this.row + (this.direction === 'down') - (this.direction === 'up');
-        return `${row},${col}`;
+        return this.getCoordFromDirection(this.direction)
     }
 }
 
 class ArrayMap extends Map {
     valuesArray() {
         return Array.from(super.values());
+    }
+
+    clone() {
+        const newMap = new Map();
+        this.forEach((value, key) => newMap.set(key, value));
+        return newMap;
     }
 }
 

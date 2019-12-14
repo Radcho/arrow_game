@@ -47,13 +47,14 @@ function attachButtonHandlers() {
         }
     });
     document.getElementById('export').addEventListener('click', () => {
-        const dl = document.createElement('a');
-        const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
-        dl.href = json;
-        dl.download = 'level.json';
-        document.body.appendChild(dl);
-        dl.click();
-        document.body.removeChild(dl);
+        solve();
+        // const dl = document.createElement('a');
+        // const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
+        // dl.href = json;
+        // dl.download = 'level.json';
+        // document.body.appendChild(dl);
+        // dl.click();
+        // document.body.removeChild(dl);
     });
 }
 
