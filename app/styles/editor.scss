@@ -33,24 +33,29 @@ body {
                 }
             }
         }
-        &-children {
+        &.pure-menu-horizontal .pure-menu-children {
             background-color: $navbar-bg-highlight;
             color: $navbar-text;
             padding: 0 0.4em;
+            width: 250px;
             .pure-menu-item {
                 display: flex;
                 margin: 0.4em 0;
                 label {
-                    flex: 1 1 auto;
+                    flex: 1;
                     padding: 0.2em 0.8em 0.2em 0.4em;
                     vertical-align: middle;
                 }
-                input {
-                    flex: 0 0 auto;
+                input, select {
+                    &[type="number"] {
+                        flex: 0 0 auto;
+                        width: 100px;
+                    }
+                    flex: 2;
                     color: black;
                 }
                 a {
-                    flex: 1 1 auto;
+                    flex: 1;
                     text-align: right;
                 }
             }

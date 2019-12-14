@@ -27,8 +27,26 @@
                     <li class="pure-menu-item"><a href="#" id="create" class="pure-menu-link">Create</a></li>
                 </ul>
             </li>
-            <li class="pure-menu-item"><a href="#" id="load" class="pure-menu-link">Load</a></li>
-            <li class="pure-menu-item"><a href="#" id="save" class="pure-menu-link">Save</a></li>
+            <li class="pure-menu-item pure-menu-has-children">
+                <a href="#" class="pure-menu-link">Load</a>
+                <ul class="pure-menu-children">
+                    <li class="pure-menu-item">
+                        <label for="load-name">Name</label>
+                        <select name="load-name" id="load-name"></select>
+                    </li>
+                    <li class="pure-menu-item"><a href="#" id="load" class="pure-menu-link">Load</a></li>
+                </ul>
+            </li>
+            <li class="pure-menu-item pure-menu-has-children">
+                <a href="#" class="pure-menu-link">Save</a>
+                <ul class="pure-menu-children">
+                    <li class="pure-menu-item">
+                        <label for="save-name">Name</label>
+                        <input type="text" name="save-name" id="save-name" placeholder="Name">
+                    </li>
+                    <li class="pure-menu-item"><a href="#" id="save" class="pure-menu-link">Save</a></li>
+                </ul>
+            </li>
             <li class="pure-menu-item"><a href="#" id="import" class="pure-menu-link">Import</a></li>
             <li class="pure-menu-item"><a href="#" id="export" class="pure-menu-link">Export</a></li>
         </ul>
@@ -51,6 +69,7 @@
 
     <script src="http://localhost:3000/libs/sprites2v.js"></script> <!-- TODO: change in prod -->
     <script src="http://localhost:3000/libs/menus.js"></script>
+    <script src="http://localhost:3000/libs/axios.min.js"></script>
     <script src="../app/js/index.js"></script>
 </body>
 </html>

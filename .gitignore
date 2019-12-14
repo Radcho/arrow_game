@@ -63,3 +63,5 @@ typings/
 # built files
 dist
 .cache
+
+server/projects

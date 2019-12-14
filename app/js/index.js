@@ -12,8 +12,12 @@ let playground;
 
 let direction = 'right';
 let tool = 'walls';
+let serverUrl = 'http://localhost:3000'; // TODO
+
+let projects = [];
 
 function main() {
+    getSavedLevels();
     canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
     context.font = "48px Arial";
@@ -41,10 +45,45 @@ function attachButtonHandlers() {
             playground.createPlayground(rows, columns);
         }
     });
-    document.getElementById('load').addEventListener('click', () => {})
-    document.getElementById('save').addEventListener('click', () => {})
-    document.getElementById('import').addEventListener('click', () => {})
-    document.getElementById('export').addEventListener('click', () => {})
+    document.getElementById('load').addEventListener('click', () => {
+        const name = document.getElementById('load-name').selectedOptions[0].value;
+        if (projects.indexOf(name) !== -1) {
+            axios.get(`${serverUrl}/projects/${name}`).then((response) => {
+                const map = response.data;
+                playground.createPlayground(map.rows, map.columns, map.tiles);
+                playground.robot.changeDirection(map.robot.direction);
+                playground.robot.moveTo(map.robot.row, map.robot.column);
+            });
+        }
+    });
+    document.getElementById('save').addEventListener('click', () => {
+        const name = document.getElementById('save-name').value;
+        if (name && playground.tiles.length > 0) {
+            // TODO: Check if project exists
+            const map = playground.toObject();
+            axios.post(`${serverUrl}/projects/save`, {
+                name,
+                project: map
+            }).then(() => {
+                getSavedLevels();
+            });
+        }
+    });
+    document.getElementById('import').addEventListener('click', () => {});
+    document.getElementById('export').addEventListener('click', () => {});
+}
+
+function getSavedLevels() {
+    axios.get(`${serverUrl}/projects`).then((response) => {
+        projects = response.data
+        const select = document.getElementById('load-name');
+        projects.forEach((projectName) => {
+            const option = document.createElement('option');
+            option.value = projectName;
+            option.innerText = projectName;
+            select.appendChild(option);
+        });
+    });
 }
 
 function attachToolbarHandlers() {
@@ -82,9 +121,13 @@ class Playground {
         this.tiles = [];
         this.activity = null;
         this.robot = null;
+        this.rows = 0;
+        this.columns = 0;
     }
 
-    createPlayground(rows, columns) {
+    createPlayground(rows, columns, tiles) {
+        this.rows = rows;
+        this.columns = columns;
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         if (this.activity) {
             this.activity.enabled = false;
@@ -94,9 +137,13 @@ class Playground {
         this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.find((tile) => tile.sprite === sprite) || sprite);
         this.robot = new Robot(this.activity);
         resizeCanvas(columns * 50, rows * 50);
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < columns; col++) {
-                this.tiles.push(new Tile(this.activity, row, col));
+        if (tiles) {
+            tiles.forEach((tile) => this.tiles.push(new Tile(this.activity, tile.row, tile.column, tile.type)));
+        } else {
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < columns; col++) {
+                    this.tiles.push(new Tile(this.activity, row, col));
+                }
             }
         }
     }
@@ -129,21 +176,39 @@ class Playground {
                 break;
         }
     }
+
+    toObject() {
+        return {
+            rows: this.rows,
+            columns: this.columns,
+            robot: this.robot.toObject(),
+            tiles: this.tiles.map((tile) => tile.toObject())
+        }
+    }
 }
 
 class Tile {
-    constructor(activity, row, column) {
+    constructor(activity, row, column, type = 'tile') {
         this.row = row;
         this.column = column;
         this.activity = activity;
         this.type = 'tile';
-        const images = ['tile', 'wall', 'finish'].map((type) => `http://localhost:3000/images/${type}.png`);
+        const images = ['tile', 'wall', 'finish'].map((type) => `${serverUrl}/images/${type}.png`);
         this.sprite = new Sprite(activity, images, 25 + (50 * column), 25 + (50 * row), clickSprite);
+        this.changeType(type);
     }
 
     changeType(type) {
         this.type = type;
         this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`${type}.png`) !== -1);
+    }
+
+    toObject() {
+        return {
+            row: this.row,
+            column: this.column,
+            type: this.type
+        };
     }
 }
 
@@ -152,7 +217,7 @@ class Robot {
         this.row = -1;
         this.column = -1;
         this.activity = activity;
-        const images = ['r', 'l', 'u', 'd'].map((dir) => `http://localhost:3000/images/robot_${dir}.png`);
+        const images = ['r', 'l', 'u', 'd'].map((dir) => `${serverUrl}/images/robot_${dir}.png`);
         this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
         this.direction = 'right';
     }
@@ -168,6 +233,14 @@ class Robot {
         this.column = column;
         this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
         this.sprite.bringToFront();
+    }
+
+    toObject() {
+        return {
+            row: this.row,
+            column: this.column,
+            direction: this.direction
+        }
     }
 }
 

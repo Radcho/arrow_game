@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
+const projectsRoute = require('./routes/projects');
 
 const port = normalizePort(process.env.PORT || '3000');
 
@@ -17,7 +18,7 @@ async function main() {
     app.use('/', express.static(path.resolve(__dirname, '../public')));
     app.use('/app', express.static(path.resolve(__dirname, '../dist')));
 
-    // Routes go here
+    app.use('/projects', projectsRoute);
 
     const server = http.createServer(app);
     server.listen(port);
