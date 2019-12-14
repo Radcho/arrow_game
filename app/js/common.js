@@ -75,32 +75,36 @@ function resizeCanvas(width, height) {
 
 class Playground {
     constructor() {
-        this.tiles = [];
         this.activity = null;
         this.robot = null;
         this.rows = 0;
         this.columns = 0;
+        this.tiles = new ArrayMap();
+    }
+
+    get tileArray() {
+        return Array
     }
 
     createPlayground(rows, columns, tiles) {
         this.rows = rows;
         this.columns = columns;
+        this.tiles = new ArrayMap();
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         if (this.activity) {
             this.activity.enabled = false;
             this.activity.animating = false;
         }
         this.activity = new Activity(canvas, true);
-        this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.find((tile) => tile.sprite === sprite) || sprite);
+        this.activity.onClick = (sprite) => this.spriteClicked(this.tiles.valuesArray().find((tile) => tile.sprite === sprite) || sprite);
         this.robot = new Robot(this.activity);
-        this.tiles = [];
         resizeCanvas(columns * 50, rows * 50);
         if (tiles) {
-            tiles.forEach((tile) => this.tiles.push(new Tile(this.activity, tile.row, tile.column, tile.type)));
+            tiles.forEach((tile) => this.tiles.set(`${tile.row},${tile.column}`, new Tile(this.activity, tile.row, tile.column, tile.type)));
         } else {
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < columns; col++) {
-                    this.tiles.push(new Tile(this.activity, row, col));
+                    this.tiles.set(`${row},${col}`, new Tile(this.activity, row, col));
                 }
             }
         }
@@ -120,6 +124,10 @@ class Tile {
         const images = ['tile', 'wall', 'finish'].map((type) => `/images/${type}.png`);
         this.sprite = new Sprite(activity, images, 25 + (50 * column), 25 + (50 * row), clickSprite);
         this.changeType(type);
+    }
+
+    get coord() {
+        return `${this.row},${this.column}`;
     }
 
     changeType(type) {
@@ -149,6 +157,18 @@ class Robot {
         this.column = column;
         this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
         this.sprite.bringToFront();
+    }
+
+    get nextCoord() {
+        const col = this.column + (this.direction === 'right') - (this.direction === 'left');
+        const row = this.row + (this.direction === 'down') - (this.direction === 'up');
+        return `${row},${col}`;
+    }
+}
+
+class ArrayMap extends Map {
+    valuesArray() {
+        return Array.from(super.values());
     }
 }
 

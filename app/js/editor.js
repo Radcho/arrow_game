@@ -24,8 +24,8 @@ function getValidatedInput(input) {
 }
 
 function attachButtonHandlers() {
-    document.getElementById('load').addEventListener('click', onLoadPressed);
-    document.getElementById('import').addEventListener('click', onImportPressed);
+    document.getElementById('load').addEventListener('click', () => onLoadPressed());
+    document.getElementById('import').addEventListener('click', () => onImportPressed());
     document.getElementById('create').addEventListener('click', () => {
         const rows = getValidatedInput(document.getElementById('rows'));
         const columns = getValidatedInput(document.getElementById('columns'));
@@ -35,7 +35,7 @@ function attachButtonHandlers() {
     });
     document.getElementById('save').addEventListener('click', () => {
         const name = document.getElementById('save-name').value;
-        if (name && playground.tiles.length > 0) {
+        if (name && playground.tiles.size > 0) {
             // TODO: Check if project exists
             const map = playground.toObject();
             axios.post(`/projects/save`, {
@@ -82,7 +82,7 @@ function changeDirection(chosenDirection) {
 
 Playground.prototype.spriteClicked = function (tile) {
     if (!(tile instanceof Tile)) {
-        tile = this.tiles.find((t) => t.sprite.isIn(tile.x, tile.y));
+        tile = this.tiles.valuesArray().find((t) => t.sprite.isIn(tile.x, tile.y));
         if (!tile) {
             return;
         }
@@ -100,7 +100,7 @@ Playground.prototype.spriteClicked = function (tile) {
             }
             break;
         case 'finish':
-            const existingFinish = this.tiles.find((t) => t.type === 'finish');
+            const existingFinish = this.tiles.valuesArray().find((t) => t.type === 'finish');
             if (existingFinish) {
                 existingFinish.changeType('tile');
             }
@@ -114,7 +114,7 @@ Playground.prototype.toObject = function () {
         rows: this.rows,
         columns: this.columns,
         robot: this.robot.toObject(),
-        tiles: this.tiles.map((tile) => tile.toObject())
+        tiles: this.tiles.valuesArray().map((tile) => tile.toObject())
     }
 }
 
