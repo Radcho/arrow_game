@@ -74,7 +74,7 @@ router.delete('/:name', async (req, res) => {
 
 async function getRealProjectName(name) {
     const file = (await fs.readdir(projects, { withFileTypes: true }))
-        .find((entry) => entry.isFile() && path.parse(entry.name).name === name);
+        .find((entry) => entry.isFile() && path.parse(entry.name).name === encodeURIComponent(name));
 
     if (file) {
         return file.name;

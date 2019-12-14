@@ -48,7 +48,7 @@ function attachButtonHandlers() {
     document.getElementById('load').addEventListener('click', () => {
         const name = document.getElementById('load-name').selectedOptions[0].value;
         if (projects.indexOf(name) !== -1) {
-            axios.get(`${serverUrl}/projects/${name}`).then((response) => {
+            axios.get(`${serverUrl}/projects/${encodeURIComponent(name)}`).then((response) => {
                 const map = response.data;
                 playground.createPlayground(map.rows, map.columns, map.tiles);
                 playground.robot.changeDirection(map.robot.direction);
@@ -62,7 +62,7 @@ function attachButtonHandlers() {
             // TODO: Check if project exists
             const map = playground.toObject();
             axios.post(`${serverUrl}/projects/save`, {
-                name,
+                name: encodeURIComponent(name),
                 project: map
             }).then(() => {
                 getSavedLevels();
@@ -75,13 +75,16 @@ function attachButtonHandlers() {
 
 function getSavedLevels() {
     axios.get(`${serverUrl}/projects`).then((response) => {
-        projects = response.data
+        projects = [];
         const select = document.getElementById('load-name');
-        projects.forEach((projectName) => {
+        select.innerHTML = '';
+        response.data.forEach((projectName) => {
             const option = document.createElement('option');
-            option.value = projectName;
-            option.innerText = projectName;
+            const name = decodeURIComponent(projectName);
+            option.value = name;
+            option.innerText = name;
             select.appendChild(option);
+            projects.push(name);
         });
     });
 }
