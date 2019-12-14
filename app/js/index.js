@@ -115,6 +115,9 @@ class Playground {
             case 'robot':
                 if (tile instanceof Tile) {
                     this.robot.moveTo(tile.row, tile.column);
+                    if (this.robot.direction !== direction) {
+                        this.robot.changeDirection(direction);
+                    }
                 }
                 break;
             case 'finish':
@@ -146,17 +149,23 @@ class Tile {
 
 class Robot {
     constructor(activity) {
+        this.row = -1;
+        this.column = -1;
         this.activity = activity;
         const images = ['r', 'l', 'u', 'd'].map((dir) => `http://localhost:3000/images/robot_${dir}.png`);
         this.sprite = new Sprite(activity, images, -100, -100, clickSprite);
+        this.direction = 'right';
     }
 
     changeDirection(dir) {
+        this.direction = dir;
         const dirChar = dir.charAt(0);
         this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`robot_${dirChar}.png`) !== -1);
     }
 
     moveTo(row, column) {
+        this.row = row;
+        this.column = column;
         this.sprite.setHome(25 + (50 * column), 25 + (50 * row));
         this.sprite.bringToFront();
     }
