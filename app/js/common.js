@@ -81,13 +81,15 @@ function solve() {
         let arrowAmount = 0;
         let solved = false;
         while (!solved && arrowAmount < 50) {
-            // console.warn(`Trying to solve with ${arrowAmount} arrows.`);
+            console.warn(`Trying to solve with ${arrowAmount} arrows.`);
             sandbox.reset();
             solved = sandbox.solveWithArrows(arrowAmount);
             arrowAmount++;
         }
         if (solved) {
-            // console.warn(firstSolution);
+            console.warn(firstSolution);
+        } else {
+            console.warn('Could not solve');
         }
     }
 }
@@ -122,7 +124,7 @@ class PlaygroundSandbox {
     reset() {
         this.robot.row = playground.robot.row;
         this.robot.column = playground.robot.column;
-        this.robot.direction = 'right';
+        this.robot.direction = playground.robot.direction;
         this.previousTile = '';
         this.tiles.forEach((value, key) => this.tiles.set(key, { steppedOn: 0, arrow: null }));
     }
@@ -183,21 +185,21 @@ class PlaygroundSandbox {
                                 // console.warn(`Used an arrow.`);
                                 solved = copy.solveWithArrows(arrowsLeft - 1);
                             }
-                            return solved;
+                            if (solved) {
+                                return true;
+                            }
                         }
+
+                        return false;
                     }
                 } else {
                     if (this.robot.isOn(playground.finish)) {
                         firstSolution = this.tiles;
                         return true;
                     }
-                    if (this.previousTile !== toCoord(this.robot.nextCoord)) {
-                        this.previousTile = this.robot.coord;
-                        this.robot.moveTo(next.row, next.column);
-                        this.tiles.get(this.robot.coord).steppedOn++;
-                    } else {
-                        break;
-                    }
+                    this.previousTile = this.robot.coord;
+                    this.robot.moveTo(next.row, next.column);
+                    this.tiles.get(this.robot.coord).steppedOn++;
                 }
             }
         }
@@ -231,6 +233,7 @@ class Playground {
         this.tiles = new ArrayMap();
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         if (this.activity) {
+            this.activity.onClick = null;
             this.activity.enabled = false;
             this.activity.animating = false;
         }

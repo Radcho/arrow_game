@@ -85,6 +85,7 @@ Playground.prototype.spriteClicked = function (tile) {
     if (!(tile instanceof Tile)) {
         tile = this.tiles.valuesArray().find((t) => t.sprite.isIn(tile.x, tile.y));
         if (!tile) {
+            console.warn('Could not find tile');
             return;
         }
     }
