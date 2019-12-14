@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Arrow Game</title>
+    <link rel="stylesheet" href="/app/styles/main.css">
+</head>
+<body class="play">
+    <nav class="pure-menu pure-menu-horizontal">
+        <a href="#" class="pure-menu-heading custom-menu-brand">Arrow Game</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item pure-menu-has-children">
+                <a href="#" class="pure-menu-link">Load</a>
+                <ul class="pure-menu-children">
+                    <li class="pure-menu-item">
+                        <label for="load-name">Name</label>
+                        <select name="load-name" id="load-name"></select>
+                    </li>
+                    <li class="pure-menu-item"><a href="#" id="load" class="pure-menu-link">Load</a></li>
+                </ul>
+            </li>
+            <li class="pure-menu-item">
+                <a href="#" id="import" class="pure-menu-link">Import</a>
+                <input id="import-file" type='file' accept="application/json" hidden/>
+            </li>
+            <li class="pure-menu-item is-right"><a href="/editor.html" class="pure-menu-link">To Editor</a></li>
+        </ul>
+    </nav>
+    <section class="main">
+        <div class="controls">
+            <div class="controls-robot">
+                <button class="control" id="robot-left"></button>
+                <button class="control" id="robot-right"></button>
+                <button class="control" id="robot-up"></button>
+                <button class="control" id="robot-down"></button>
+            </div>
+        </div>
+        <canvas id="canvas" width="200px" height="80px"></canvas>
+    </section>
+
+    <script src="/libs/sprites2v.js"></script>
+    <script src="/libs/menus.js"></script>
+    <script src="/libs/axios.min.js"></script>
+    <script src="/app/js/index.js"></script>
+</body>
+</html>

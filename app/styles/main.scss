@@ -1,3 +1,135 @@
 @import "/libs/pure.min.css";
 @import "variables";
 @import "editor";
+
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: $main-bg;
+    .pure-menu {
+        flex: 0 0 auto;
+        background-color: $navbar-bg;
+        display: flex;
+        &-heading {
+            color: $navbar-text;
+            font-weight: bold;
+        }
+        &-item {
+            flex: 0 0 auto;
+            &.is-right {
+                margin-left: auto;
+            }
+        }
+        &-link {
+            color: $navbar-text;
+            &:hover {
+                background-color: $navbar-bg-highlight;
+            }
+            &:focus, &:active {
+                background-color: $navbar-bg-pressed;
+            }
+        }
+        &-active {
+            .pure-menu-link {
+                background-color: $navbar-bg-highlight;
+                &:hover, &:focus, &:active {
+                    background-color: $navbar-bg-pressed;
+                }
+            }
+        }
+        &.pure-menu-horizontal {
+            .custom-menu-brand {
+                flex: 0;
+            }
+            .pure-menu-list {
+                display: flex;
+                flex: 1;
+            }
+            .pure-menu-children {
+                background-color: $navbar-bg-highlight;
+                color: $navbar-text;
+                padding: 0 0.4em;
+                width: 250px;
+                .pure-menu-item {
+                    display: flex;
+                    margin: 0.4em 0;
+                    label {
+                        flex: 1;
+                        padding: 0.2em 0.8em 0.2em 0.4em;
+                        vertical-align: middle;
+                    }
+                    input, select {
+                        flex: 2;
+                        color: black;
+                    }
+                    a {
+                        flex: 1;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+    .main {
+        flex: 1 1 auto;
+        display: flex;
+        align-self: center;
+        align-items: center;
+        justify-content: center;
+        canvas {
+            width: 200px;
+            height: 80px;
+            margin: auto;
+            border: 1px solid black;
+            background-color: $canvas-bg;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            margin-right: 10px;
+            button {
+                width: 100px;
+                height: 100px;
+                background-color: $navbar-text;
+                border: 1px solid $navbar-bg;
+                background-size: 80%;
+                background-repeat: no-repeat;
+                background-position: center;
+                &.active {
+                    border: 2px solid $finish-blue;
+                    background-color: $canvas-bg;
+                }
+                &#robot {
+                    &-right {
+                        background-image: url('/images/arrow_r.png');
+                    }
+                    &-left {
+                        background-image: url('/images/arrow_l.png');
+                    }
+                    &-up {
+                        background-image: url('/images/arrow_u.png');
+                    }
+                    &-down {
+                        background-image: url('/images/arrow_d.png');
+                    }
+                }
+            }
+            &-robot {
+                width: 100px;
+                height: 100px;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                button {
+                    width: 50px;
+                    height: 50px;
+                }
+            }
+        }
+    }
+}

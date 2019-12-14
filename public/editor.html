@@ -7,7 +7,7 @@
     <title>Arrow Game - Editor</title>
     <link rel="stylesheet" href="/app/styles/main.css">
 </head>
-<body>
+<body class="editor">
     <nav class="pure-menu pure-menu-horizontal">
         <a href="#" class="pure-menu-heading custom-menu-brand">Arrow Game - Editor</a>
         <ul class="pure-menu-list">
@@ -50,6 +50,7 @@
                 <input id="import-file" type='file' accept="application/json" hidden/>
             </li>
             <li class="pure-menu-item"><a href="#" id="export" class="pure-menu-link">Export</a></li>
+            <li class="pure-menu-item is-right"><a href="/" class="pure-menu-link">To Game</a></li>
         </ul>
     </nav>
     <section class="main">
@@ -62,15 +63,15 @@
                 <button class="control" id="robot-right"></button>
                 <button class="control" id="robot-up"></button>
                 <button class="control" id="robot-down"></button>
-            </div>
-            
+            </div>   
         </div>
         <canvas id="canvas" width="200px" height="80px"></canvas>
     </section>
 
-    <script src="/libs/sprites2v.js"></script> <!-- TODO: change in prod -->
+    <script src="/libs/sprites2v.js"></script>
     <script src="/libs/menus.js"></script>
     <script src="/libs/axios.min.js"></script>
-    <script src="/app/js/index.js"></script>
+    <script src="/app/js/common.js"></script>
+    <script src="/app/js/editor.js"></script>
 </body>
 </html>
