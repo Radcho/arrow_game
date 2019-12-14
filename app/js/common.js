@@ -77,8 +77,18 @@ function resizeCanvas(width, height) {
 
 function solve() {
     if (playground.robot.row !== -1 && playground.robot.column !== -1 && playground.finish) {
-        // Try to solve without arrows
         const sandbox = new PlaygroundSandbox();
+        let arrowAmount = 0;
+        let solved = false;
+        while (!solved && arrowAmount < 50) {
+            // console.warn(`Trying to solve with ${arrowAmount} arrows.`);
+            sandbox.reset();
+            solved = sandbox.solveWithArrows(arrowAmount);
+            arrowAmount++;
+        }
+        if (solved) {
+            // console.warn(firstSolution);
+        }
     }
 }
 
@@ -104,37 +114,94 @@ class PlaygroundSandbox {
         this.robot = new Robot(null, true);
         this.robot.row = playground.robot.row;
         this.robot.column = playground.robot.column;
-        this.tiles = new ArrayMap(playground.tiles.valuesArray().map((tile) => [tile.coord, 0]));
+        this.robot.direction = playground.robot.direction;
+        this.previousTile = '';
+        this.tiles = new ArrayMap(playground.tiles.valuesArray().map((tile) => [tile.coord, { steppedOn: 0, arrow: null }]));
     }
 
     reset() {
         this.robot.row = playground.robot.row;
         this.robot.column = playground.robot.column;
-        this.tiles.forEach((value, key) => this.tiles.set(key, 0));
+        this.robot.direction = 'right';
+        this.previousTile = '';
+        this.tiles.forEach((value, key) => this.tiles.set(key, { steppedOn: 0, arrow: null }));
     }
 
     solveWithArrows(arrowsLeft) {
+        // console.warn(`Solving with ${arrowsLeft}`);
         // TODO: catch spinning in place
-        while (this.tiles.get(this.robot.coord) < 3) {
-            if (arrowsLeft) {
-                // has arrows to spare
+        while (this.tiles.get(this.robot.coord).steppedOn < 3) {
+            const currentTile = this.tiles.get(this.robot.coord);
+            const next = this.robot.nextCoord;
+            const nextTile = playground.tiles.get(toCoord(next));
+            // console.warn(`Currently on ${this.robot.coord} standing on ${JSON.stringify(currentTile)}`);
+            if (currentTile.arrow) {
+                this.robot.direction = currentTile.arrow;
+                this.previousTile = this.robot.coord;
+                this.robot.moveTo(this.robot.nextCoord.row, this.robot.nextCoord.column);
+                this.tiles.get(this.robot.coord).steppedOn++;
+                // console.warn(`Stepped on an arrow, moved to ${this.robot.coord}`);
+            } else if (!nextTile || nextTile.type === 'wall') {
+                this.robot.turnRight();
+                // console.warn('Wall ahead. Turning right.');
             } else {
-                console.warn(`robot on ${this.robot.row}-${this.robot.column}`);
-                if (this.robot.isOn(playground.finish)) {
-                    firstSolution = this.tiles;
-                    return true;
-                }
-                const next = this.robot.nextCoord;
-                const nextTile = playground.tiles.get(toCoord(this.robot.nextCoord));
-                if (!nextTile || nextTile.type === 'wall') {
-                    this.robot.turnRight();
+                if (arrowsLeft) {
+                    let possibilities = this.robot.possibleDirections.filter((poss) => poss !== this.previousTile);
+                    // console.warn(`Found ${possibilities.length} possible directions. These are ${possibilities.join(', ')}`);
+                    if (possibilities.length === 0) {
+                        // console.warn(`No possible places to move.`);
+                        break;
+                    } else if (possibilities.length === 1) {
+                        const possibility = possibilities[0]
+                        if (toCoord(this.robot.nextCoord) !== possibility) {
+                            while (toCoord(this.robot.nextCoord) !== possibility) {
+                                this.robot.turnRight();
+                            }
+                            arrowsLeft--;
+                            // console.warn(`Used an arrow.`);
+                            this.tiles.get(this.robot.coord).arrow = this.robot.direction;
+                        }
+                        this.previousTile = this.robot.coord;
+                        this.robot.moveTo(this.robot.nextCoord.row, this.robot.nextCoord.column);
+                        this.tiles.get(this.robot.coord).steppedOn++;
+                        // console.warn(`Moved to only place possible: ${this.robot.coord}`);
+                    } else {
+                        for (let possibility of possibilities) {
+                            const copy = this.spawnCopy();
+                            let solved = false;
+                            if (toCoord(copy.robot.nextCoord) === possibility) {
+                                // console.warn(`Going forward.`);
+                                copy.previousTile = copy.robot.coord;
+                                copy.robot.moveTo(copy.robot.nextCoord.row, copy.robot.nextCoord.column);
+                                solved = copy.solveWithArrows(arrowsLeft);
+                            } else {
+                                while (toCoord(copy.robot.nextCoord) !== possibility) {
+                                    copy.robot.turnRight();
+                                }
+                                copy.tiles.get(copy.robot.coord).arrow = copy.robot.direction;
+                                // console.warn(`Going ${copy.tiles.get(copy.robot.coord).arrow}`);
+                                // console.warn(`Used an arrow.`);
+                                solved = copy.solveWithArrows(arrowsLeft - 1);
+                            }
+                            return solved;
+                        }
+                    }
                 } else {
-                    this.robot.moveTo(next.row, next.column);
-                    this.tiles.set(this.robot.coord, this.tiles.get(this.robot.coord) + 1)
+                    if (this.robot.isOn(playground.finish)) {
+                        firstSolution = this.tiles;
+                        return true;
+                    }
+                    if (this.previousTile !== toCoord(this.robot.nextCoord)) {
+                        this.previousTile = this.robot.coord;
+                        this.robot.moveTo(next.row, next.column);
+                        this.tiles.get(this.robot.coord).steppedOn++;
+                    } else {
+                        break;
+                    }
                 }
             }
         }
-
+        // console.warn('No solutions found, exiting');
         return false;
     }
 
@@ -142,6 +209,8 @@ class PlaygroundSandbox {
         const sandbox = new PlaygroundSandbox();
         sandbox.robot.row = this.robot.row;
         sandbox.robot.column = this.robot.column;
+        sandbox.robot.direction = this.robot.direction;
+        sandbox.previousTile = this.previousTile;
         sandbox.tiles = this.tiles.clone();
         return sandbox;
     }
@@ -276,7 +345,7 @@ class Robot {
 
     get possibleDirections() {
         return ['left', 'right', 'up', 'down']
-            .filter((dir) => dir !== oppositeDirection(this.direction))
+            //.filter((dir) => dir !== oppositeDirection(this.direction)) lets try it without this for now
             .map((dir) => toCoord(this.getCoordFromDirection(dir)))
             .filter((coord) => playground.tiles.get(coord) && playground.tiles.get(coord).type !== 'wall');
     }
@@ -292,8 +361,8 @@ class ArrayMap extends Map {
     }
 
     clone() {
-        const newMap = new Map();
-        this.forEach((value, key) => newMap.set(key, value));
+        const newMap = new ArrayMap();
+        this.forEach((value, key) => newMap.set(key, typeof value === 'object' ? Object.assign({}, value) : value));
         return newMap;
     }
 }

@@ -35,5 +35,5 @@
     "express": "^4.17.1",
     "purecss": "^1.0.1"
   },
-  "browserslist": "> 0.5%, not IE 11"
+  "browserslist": "> 5%, not IE 11"
 }

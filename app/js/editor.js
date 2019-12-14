@@ -91,9 +91,12 @@ Playground.prototype.spriteClicked = function (tile) {
     switch (tool) {
         case 'walls':
             tile.changeType(tile.type === 'tile' ? 'wall' : 'tile');
+            if (this.robot.isOn(tile)) {
+                this.robot.moveTo(-1, -1);
+            }
             break;
         case 'robot':
-            if (tile instanceof Tile) {
+            if (tile instanceof Tile && tile.type === 'tile') {
                 this.robot.moveTo(tile.row, tile.column);
                 if (this.robot.direction !== direction) {
                     this.robot.changeDirection(direction);
