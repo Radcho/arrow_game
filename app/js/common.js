@@ -76,18 +76,18 @@ function resizeCanvas(width, height) {
 }
 
 function solve() {
+    firstSolution = null;
     if (playground.robot.row !== -1 && playground.robot.column !== -1 && playground.finish) {
         const sandbox = new PlaygroundSandbox();
         let arrowAmount = 0;
         let solved = false;
         while (!solved && arrowAmount < 50) {
-            console.warn(`Trying to solve with ${arrowAmount} arrows.`);
             sandbox.reset();
             solved = sandbox.solveWithArrows(arrowAmount);
             arrowAmount++;
         }
         if (solved) {
-            console.warn(firstSolution);
+            // console.warn(firstSolution);
         } else {
             console.warn('Could not solve');
         }
@@ -279,6 +279,20 @@ class Tile {
     changeType(type) {
         this.type = type;
         this.sprite.image = this.sprite.images.find((im) => im.src.indexOf(`${type}.png`) !== -1);
+    }
+}
+
+class Arrow {
+    constructor(activity, row, column, dir) {
+        this.row = row;
+        this.column = column;
+        this.direction = dir;
+        const dirChar = dir.charAt(0);
+        this.sprite = new Sprite(activity, `/images/arrow_${dirChar}.png`, 25 + (50 * column), 25 + (50 * row), clickSprite);
+    }
+
+    erase() {
+        this.sprite.erase();
     }
 }
 

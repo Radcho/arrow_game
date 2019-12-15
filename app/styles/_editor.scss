@@ -1,9 +1,23 @@
 @import "variables";
 
 body.editor {
-    .pure-menu.pure-menu-horizontal .pure-menu-children .pure-menu-item input[type="number"] {
-        flex: 0 0 auto;
-        width: 100px;
+    .pure-menu.pure-menu-horizontal {
+        .pure-menu-item #solve {
+            background-color: $solve-bg;
+            &:hover {
+                background-color: $solve-bg-highlight;
+            }
+            &.bad {
+                background-color: $solve-bg-bad;
+                &:hover {
+                    background-color: $solve-bg-bad-highlight;
+                }
+            }
+        }
+        .pure-menu-children .pure-menu-item input[type="number"] {
+            flex: 0 0 auto;
+            width: 100px;
+        }
     }
     .main .controls button {
         &#walls {

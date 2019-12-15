@@ -47,14 +47,41 @@ function attachButtonHandlers() {
         }
     });
     document.getElementById('export').addEventListener('click', () => {
+        const dl = document.createElement('a');
+        const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
+        dl.href = json;
+        dl.download = 'level.json';
+        document.body.appendChild(dl);
+        dl.click();
+        document.body.removeChild(dl);
+    });
+    const solveButton = document.getElementById('solve');
+    solveButton.addEventListener('click', () => {
         solve();
-        // const dl = document.createElement('a');
-        // const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
-        // dl.href = json;
-        // dl.download = 'level.json';
-        // document.body.appendChild(dl);
-        // dl.click();
-        // document.body.removeChild(dl);
+        clearArrows();
+        if (firstSolution) {
+            displaySolution();
+            solveButton.classList.remove('bad');
+        } else {
+            solveButton.classList.add('bad');
+        }
+    });
+}
+
+let arrows = [];
+
+function clearArrows() {
+    arrows.forEach((arrow) => arrow.erase());
+    arrows = [];
+    playground.activity.paint();
+}
+
+function displaySolution() {
+    firstSolution.forEach((tileInfo, key) => {
+        if (tileInfo.arrow) {
+            let [row, col] = key.split(',');
+            arrows.push(new Arrow(playground.activity, row, col, tileInfo.arrow));
+        }
     });
 }
 
