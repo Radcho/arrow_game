@@ -175,11 +175,3 @@ Tile.prototype.toObject = function () {
         type: this.type
     };
 }
-
-Robot.prototype.toObject = function () {
-    return {
-        row: this.row,
-        column: this.column,
-        direction: this.direction
-    }
-}

@@ -412,20 +412,22 @@ class Robot {
     }
 
     turnRight() {
+        let dir;
         switch (this.direction) {
             case 'up':
-                this.direction = 'right';
+                dir = 'right';
                 break;
             case 'down':
-                this.direction = 'left';
+                dir = 'left';
                 break;
             case 'left':
-                this.direction = 'up';
+                dir = 'up';
                 break;
             case 'right':
-                this.direction = 'down';
+                dir = 'down';
                 break;
         }
+        this.changeDirection(dir);
     }
 
     getCoordFromDirection(dir) {
@@ -435,6 +437,14 @@ class Robot {
             row,
             column
         };
+    }
+
+    toObject() {
+        return {
+            row: this.row,
+            column: this.column,
+            direction: this.direction
+        }
     }
 
     get possibleDirections() {
