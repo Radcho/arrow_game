@@ -98,7 +98,7 @@ function solve() {
         let solved = false;
         while (!solved && arrowAmount < 50) {
             sandbox.reset();
-            solved = sandbox.solveWithArrows(arrowAmount);
+            solved = sandbox.solveWithAttempts(arrowAmount);
             arrowAmount++;
         }
         if (solved) {
@@ -149,7 +149,7 @@ class PlaygroundSandbox {
         this.tiles.forEach((value, key) => this.tiles.set(key, { steppedOn: 0, arrow: null }));
     }
 
-    solveWithArrows(arrowsLeft) {
+    solveWithAttempts(arrowsLeft) {
         // console.warn(`Solving with ${arrowsLeft}`);
         // TODO: catch spinning in place
         while (this.tiles.get(this.robot.coord).steppedOn < 3) {
@@ -195,7 +195,7 @@ class PlaygroundSandbox {
                                 // console.warn(`Going forward.`);
                                 copy.previousTile = copy.robot.coord;
                                 copy.robot.moveTo(copy.robot.nextCoord.row, copy.robot.nextCoord.column);
-                                solved = copy.solveWithArrows(arrowsLeft);
+                                solved = copy.solveWithAttempts(arrowsLeft);
                             } else {
                                 while (toCoord(copy.robot.nextCoord) !== possibility) {
                                     copy.robot.turnRight();
@@ -203,7 +203,7 @@ class PlaygroundSandbox {
                                 copy.tiles.get(copy.robot.coord).arrow = copy.robot.direction;
                                 // console.warn(`Going ${copy.tiles.get(copy.robot.coord).arrow}`);
                                 // console.warn(`Used an arrow.`);
-                                solved = copy.solveWithArrows(arrowsLeft - 1);
+                                solved = copy.solveWithAttempts(arrowsLeft - 1);
                             }
                             if (solved) {
                                 return true;
@@ -224,6 +224,36 @@ class PlaygroundSandbox {
             }
         }
         // console.warn('No solutions found, exiting');
+        return false;
+    }
+
+    solveWithArrows(arrows) {
+        arrows.forEach((arrow) => {
+            this.tiles.get(toCoord({row: arrow.row, column: arrow.column})).arrow = arrow.direction;
+        });
+        while (this.tiles.get(this.robot.coord).steppedOn < 3) {
+            const currentTile = this.tiles.get(this.robot.coord);
+            const next = this.robot.nextCoord;
+            const nextTile = playground.tiles.get(toCoord(next));
+            if (currentTile.arrow) {
+                this.robot.direction = currentTile.arrow;
+                let targetTile = this.tiles.get(toCoord(this.robot.nextCoord));
+                while (!targetTile || targetTile.type === 'wall') {
+                    this.robot.turnRight();
+                    targetTile = this.tiles.get(toCoord(this.robot.nextCoord));
+                }
+                this.robot.moveTo(this.robot.nextCoord.row, this.robot.nextCoord.column);
+                this.tiles.get(this.robot.coord).steppedOn++;
+            } else if (!nextTile || nextTile.type === 'wall') {
+                this.robot.turnRight();
+            } else {
+                if (this.robot.isOn(playground.finish)) {
+                    return true;
+                }
+                this.robot.moveTo(next.row, next.column);
+                this.tiles.get(this.robot.coord).steppedOn++;
+            }
+        }
         return false;
     }
 
