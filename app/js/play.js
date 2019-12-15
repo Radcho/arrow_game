@@ -49,7 +49,7 @@ function handleDrop(event) {
         const targetTile = playground.tiles.valuesArray().find((tile) => tile.sprite.isIn(event.offsetX, event.offsetY));
         if (targetTile && targetTile.type === 'tile') {
             playground.addArrow(targetTile.row, targetTile.column, draggedArrow);
-            const solvable = new PlaygroundSandbox().solveWithArrows(playground.arrows);
+            const solvable = playground.arrows.size === solvableWith ? new PlaygroundSandbox().solveWithArrows(playground.arrows) : false;
             setStatus(solvable ? 'a' : 'b');
         }
     }

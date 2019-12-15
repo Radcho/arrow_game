@@ -50,4 +50,13 @@ body.editor {
             }
         }
     }
+    footer.status-display span {
+        &#status {
+            font-size: 4.5em;
+            flex: 1 1 auto;
+        }
+        &.solvable {
+            display: none;
+        }
+    }
 }

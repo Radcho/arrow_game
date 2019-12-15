@@ -9,7 +9,7 @@ let canvas;
 let playground;
 
 let firstSolution = null;
-
+let solvableWith = -1;
 let projects = [];
 
 function onLoadPressed(loadButton) {
@@ -55,6 +55,8 @@ function loadMap(map) {
     playground.createPlayground(map.rows, map.columns, map.tiles);
     playground.robot.changeDirection(map.robot.direction);
     playground.robot.moveTo(map.robot.row, map.robot.column);
+    solvableWith = map.solvableWith;
+    document.getElementById('solvable-in').innerText = solvableWith;
 }
 
 function getSavedLevels() {

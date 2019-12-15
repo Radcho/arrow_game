@@ -1,5 +1,14 @@
 @import "variables";
 
 body.play {
-
+    footer.status-display span {
+        &#status {
+            font-size: 2em;
+            flex: 1 1 auto;
+        }
+        &.solvable {
+            flex: 0 0 auto;
+            margin: 0.5em 0;
+        }
+    }
 }

@@ -162,6 +162,7 @@ Playground.prototype.toObject = function () {
     return {
         rows: this.rows,
         columns: this.columns,
+        solvableWith: firstSolution.valuesArray().filter((tileInfo) => tileInfo.arrow !== null).length,
         robot: this.robot.toObject(),
         tiles: this.tiles.valuesArray().map((tile) => tile.toObject())
     }
