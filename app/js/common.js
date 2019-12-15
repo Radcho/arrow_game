@@ -12,12 +12,17 @@ let firstSolution = null;
 
 let projects = [];
 
-function onLoadPressed() {
+function onLoadPressed(loadButton) {
     const name = document.getElementById('load-name').selectedOptions[0].value;
     if (projects.indexOf(name) !== -1) {
         axios.get(`/projects/${encodeURIComponent(name)}`).then((response) => {
             const map = response.data;
             loadMap(map);
+            document.dispatchEvent(new Event('mousedown'));
+            loadButton.classList.remove('bad');
+        }, (error) => {
+            console.error(error);
+            loadButton.classList.add('bad');
         });
     }
 }
@@ -88,10 +93,15 @@ function solve() {
         }
         if (solved) {
             // console.warn(firstSolution);
+            return true;
         } else {
             console.warn('Could not solve');
         }
+    } else {
+        console.warn('Both a robot and a finish must be defined.');
     }
+
+    return false;
 }
 
 function toCoord({ row, column }) {

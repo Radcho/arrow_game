@@ -13,8 +13,9 @@ function main() {
 }
 
 function attachButtonHandlers() {
-    document.getElementById('load').addEventListener('click', onLoadPressed);
-    document.getElementById('import').addEventListener('click', onImportPressed);
+    const loadButton = document.getElementById('load');
+    loadButton.addEventListener('click', () => onLoadPressed(loadButton));
+    document.getElementById('import').addEventListener('click', () => onImportPressed());
 }
 
 function attachToolbarHandlers() {

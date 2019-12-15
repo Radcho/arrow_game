@@ -8,9 +8,9 @@ body.editor {
                 background-color: $solve-bg-highlight;
             }
             &.bad {
-                background-color: $solve-bg-bad;
+                background-color: $button-bg-bad;
                 &:hover {
-                    background-color: $solve-bg-bad-highlight;
+                    background-color: $button-bg-bad-highlight;
                 }
             }
         }

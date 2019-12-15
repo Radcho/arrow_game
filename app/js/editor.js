@@ -24,18 +24,25 @@ function getValidatedInput(input) {
 }
 
 function attachButtonHandlers() {
-    document.getElementById('load').addEventListener('click', () => onLoadPressed());
+    const loadButton = document.getElementById('load');
+    loadButton.addEventListener('click', () => onLoadPressed(loadButton));
     document.getElementById('import').addEventListener('click', () => onImportPressed());
-    document.getElementById('create').addEventListener('click', () => {
+    const createButton = document.getElementById('create');
+    createButton.addEventListener('click', () => {
         const rows = getValidatedInput(document.getElementById('rows'));
         const columns = getValidatedInput(document.getElementById('columns'));
         if (rows && columns) {
             playground.createPlayground(rows, columns);
+            document.dispatchEvent(new Event('mousedown'));
+            createButton.classList.remove('bad');
+        } else {
+            createButton.classList.add('bad');
         }
     });
-    document.getElementById('save').addEventListener('click', () => {
+    const saveButton = document.getElementById('save');
+    saveButton.addEventListener('click', () => {
         const name = document.getElementById('save-name').value;
-        if (name && playground.tiles.size > 0) {
+        if (name && playground.tiles.size > 0 && playground.isComplete()) {
             // TODO: Check if project exists
             const map = playground.toObject();
             axios.post(`/projects/save`, {
@@ -43,7 +50,14 @@ function attachButtonHandlers() {
                 project: map
             }).then(() => {
                 getSavedLevels();
+                document.dispatchEvent(new Event('mousedown'));
+                saveButton.classList.remove('bad');
+            }, (error) => {
+                console.error(error);
+                saveButton.classList.add('bad');
             });
+        } else {
+            saveButton.classList.add('bad');
         }
     });
     document.getElementById('export').addEventListener('click', () => {
@@ -139,6 +153,10 @@ Playground.prototype.spriteClicked = function (tile) {
             tile.changeType('finish');
             break;
     }
+}
+
+Playground.prototype.isComplete = function () {
+    return solve();
 }
 
 Playground.prototype.toObject = function () {
