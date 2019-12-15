@@ -71,11 +71,15 @@ function attachButtonHandlers() {
     });
     const solveButton = document.getElementById('solve');
     solveButton.addEventListener('click', () => {
-        solve();
-        clearArrows();
-        if (firstSolution) {
-            displaySolution();
-            solveButton.classList.remove('bad');
+        if (playground.tiles.size > 0) {
+            solve();
+            clearArrows();
+            if (firstSolution) {
+                displaySolution();
+                solveButton.classList.remove('bad');
+            } else {
+                solveButton.classList.add('bad');
+            }
         } else {
             solveButton.classList.add('bad');
         }
