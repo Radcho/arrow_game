@@ -12,8 +12,8 @@ async function main() {
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.set('port', port);
-    // Dev only
-    app.use(cors());
+    // // Dev only
+    // app.use(cors());
 
     app.use('/', express.static(path.resolve(__dirname, '../public')));
     app.use('/app', express.static(path.resolve(__dirname, '../dist')));

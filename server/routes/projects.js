@@ -3,6 +3,9 @@ const fs = require('fs').promises;
 const router = require('express').Router();
 const projects = path.resolve(__dirname, '../projects');
 
+/**
+ * Get a list of saved projects
+ */
 router.get('/', async (req, res) => {
     try {
         const projectFiles = (await fs.readdir(projects, { withFileTypes: true }))
@@ -15,6 +18,9 @@ router.get('/', async (req, res) => {
     }
 });
 
+/**
+ * Get the specific file from the file system.
+ */
 router.get('/:name', async (req, res) => {
     let projectName;
     try {
@@ -35,6 +41,9 @@ router.get('/:name', async (req, res) => {
     }
 });
 
+/**
+ * Save the project to a new file on the system. If a file with the same name already exists, replace it.
+ */
 router.post('/save', async (req, res) => {
     try {
         const name = req.body.name;
@@ -58,20 +67,10 @@ router.post('/save', async (req, res) => {
     }
 });
 
-router.delete('/:name', async (req, res) => {
-    try {
-        const realName = await getRealProjectName(req.params.name);
-        if (realName) {
-            await fs.unlink(path.join(projects, realName));
-        }
-
-        res.sendStatus(200);
-    } catch (err) {
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
-
+/**
+ * Get the real filename on the file system
+ * @param {string} name User-friendly name of the file
+ */
 async function getRealProjectName(name) {
     const file = (await fs.readdir(projects, { withFileTypes: true }))
         .find((entry) => entry.isFile() && path.parse(entry.name).name === encodeURIComponent(name));

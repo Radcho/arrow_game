@@ -1,7 +1,18 @@
 window.addEventListener('load', main);
+
+/**
+ * Chosen robot direciton.
+ */
 let direction = 'right';
+
+/**
+ * Chosen tool.
+ */
 let tool = 'walls';
 
+/**
+ * Main function kickstarting the application.
+ */
 function main() {
     getSavedLevels();
     canvas = document.querySelector('canvas');
@@ -14,6 +25,11 @@ function main() {
     attachToolbarHandlers();
 }
 
+/**
+ * Validates the numerical input from column/row inputs.
+ * @param {HTMLInputElement} input Numberic input in the menus.
+ * @returns {number} Input value.
+ */
 function getValidatedInput(input) {
     const value = parseInt(input.value);
     if (value && !isNaN(value) && value > 0 && value <= 15) {
@@ -23,10 +39,15 @@ function getValidatedInput(input) {
     return 0;
 }
 
+/**
+ * Attaches handlers to navbar buttons.
+ */
 function attachButtonHandlers() {
+    // Attach handlers to common buttons
     const loadButton = document.getElementById('load');
     loadButton.addEventListener('click', () => onLoadPressed(loadButton));
     document.getElementById('import').addEventListener('click', () => onImportPressed());
+    // Create a playground with the specified dimensions.
     const createButton = document.getElementById('create');
     createButton.addEventListener('click', () => {
         const rows = getValidatedInput(document.getElementById('rows'));
@@ -39,11 +60,12 @@ function attachButtonHandlers() {
             createButton.classList.add('bad');
         }
     });
+    // Save the playground if it's valid.
     const saveButton = document.getElementById('save');
     saveButton.addEventListener('click', () => {
         const name = document.getElementById('save-name').value;
+        // Only save if the level is solvable.
         if (name && playground.tiles.size > 0 && playground.isComplete()) {
-            // TODO: Check if project exists
             const map = playground.toObject();
             axios.post(`/projects/save`, {
                 name: encodeURIComponent(name),
@@ -60,6 +82,7 @@ function attachButtonHandlers() {
             saveButton.classList.add('bad');
         }
     });
+    // Export the level in json format. This allows exporting incomplete levels.
     document.getElementById('export').addEventListener('click', () => {
         const dl = document.createElement('a');
         const json = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(playground.toObject()))}`;
@@ -69,6 +92,7 @@ function attachButtonHandlers() {
         dl.click();
         document.body.removeChild(dl);
     });
+    // Tries to find the level solution.
     const solveButton = document.getElementById('solve');
     solveButton.addEventListener('click', () => {
         if (playground.tiles.size > 0) {
@@ -89,6 +113,9 @@ function attachButtonHandlers() {
     });
 }
 
+/**
+ * Displays the solution in the  playground.
+ */
 function displaySolution() {
     firstSolution.forEach((tileInfo, key) => {
         if (tileInfo.arrow) {
@@ -98,6 +125,9 @@ function displaySolution() {
     });
 }
 
+/**
+ * Attaches handlers to toolbar buttons.
+ */
 function attachToolbarHandlers() {
     document.getElementById('walls').addEventListener('click', () => changeTool('walls'));
     document.getElementById('finish').addEventListener('click', () => changeTool('finish'));
@@ -108,12 +138,20 @@ function attachToolbarHandlers() {
     document.getElementById('robot-down').addEventListener('click', () => changeDirection('down'));
 }
 
+/**
+ * Change the currently selected tool.
+ * @param {string} chosenTool Selected tool.
+ */
 function changeTool(chosenTool) {
     tool = chosenTool;
     document.querySelectorAll('.control').forEach((el) => el.classList.remove('active'));
     document.getElementById(chosenTool).classList.add('active');
 }
 
+/**
+ * Changes the chosen direction and rotates the robot accordingly.
+ * @param {string} chosenDirection Chosen direction.
+ */
 function changeDirection(chosenDirection) {
     direction = chosenDirection;
     const robot = document.getElementById('robot');
@@ -122,6 +160,7 @@ function changeDirection(chosenDirection) {
 }
 
 Playground.prototype.spriteClicked = function (tile) {
+    // If the clicked object was a different sprite, find the tile it was on.
     if (!(tile instanceof Tile)) {
         tile = this.tiles.valuesArray().find((t) => t.sprite.isIn(tile.x, tile.y));
         if (!tile) {
@@ -130,12 +169,14 @@ Playground.prototype.spriteClicked = function (tile) {
         }
     }
     switch (tool) {
+        // Switch between walls.
         case 'walls':
             tile.changeType(tile.type === 'tile' ? 'wall' : 'tile');
             if (this.robot.isOn(tile)) {
                 this.robot.moveTo(-1, -1);
             }
             break;
+        // Move the robot to the position if the tile is not a wall.
         case 'robot':
             if (tile instanceof Tile && tile.type === 'tile') {
                 this.robot.moveTo(tile.row, tile.column);
@@ -144,6 +185,7 @@ Playground.prototype.spriteClicked = function (tile) {
                 }
             }
             break;
+        // Move the finish to the clicked position. Removing another finish if necessary.
         case 'finish':
             const existingFinish = this.tiles.valuesArray().find((t) => t.type === 'finish');
             if (existingFinish) {
@@ -154,10 +196,18 @@ Playground.prototype.spriteClicked = function (tile) {
     }
 }
 
+/**
+ * Is the level completed.
+ * @returns {boolean} Level solvable.
+ */
 Playground.prototype.isComplete = function () {
     return solve();
 }
 
+/**
+ * Serializes the playground object.
+ * @returns {Object} Serialized playground.
+ */
 Playground.prototype.toObject = function () {
     return {
         rows: this.rows,
@@ -168,6 +218,10 @@ Playground.prototype.toObject = function () {
     }
 }
 
+/**
+ * Serializes the tile object.
+ * @returns {Object} Serialized tile.
+ */
 Tile.prototype.toObject = function () {
     return {
         row: this.row,
