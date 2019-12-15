@@ -144,4 +144,25 @@ body {
             }
         }
     }
+    footer.status-display {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        height: 100px;
+        width: 80px;
+        background-color: $canvas-bg;
+        border-top: 1px solid $navbar-bg;
+        border-right: 1px solid $navbar-bg;
+        border-top-right-radius: 20px;
+        display: flex;
+        align-items: center;
+        &.hidden {
+            display: none;
+        }
+        span {
+            font-size: 4em;
+            text-align: center;
+            flex: 1;
+        }
+    }
 }

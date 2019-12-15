@@ -80,6 +80,16 @@ function resizeCanvas(width, height) {
     canvas.style.height = height + 'px';
 }
 
+function setStatus(status) {
+    const footer = document.querySelector('footer');
+    if (status) {
+        footer.querySelector('#status').innerText = status;
+        footer.classList.remove('hidden');
+    } else {
+        footer.classList.add('hidden');
+    }
+}
+
 function solve() {
     firstSolution = null;
     if (playground.robot.row !== -1 && playground.robot.column !== -1 && playground.finish) {

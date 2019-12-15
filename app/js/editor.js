@@ -75,12 +75,15 @@ function attachButtonHandlers() {
             solve();
             clearArrows();
             if (firstSolution) {
+                setStatus('✔');
                 displaySolution();
                 solveButton.classList.remove('bad');
             } else {
+                setStatus();
                 solveButton.classList.add('bad');
             }
         } else {
+            setStatus();
             solveButton.classList.add('bad');
         }
     });
