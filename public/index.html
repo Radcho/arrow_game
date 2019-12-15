@@ -31,14 +31,15 @@
     <section class="main">
         <div class="controls">
             <div class="controls-robot">
-                <button class="control" id="robot-left"></button>
-                <button class="control" id="robot-right"></button>
-                <button class="control" id="robot-up"></button>
-                <button class="control" id="robot-down"></button>
+                <div class="control" id="robot-up" draggable="true"></div>
+                <div class="control" id="robot-left" draggable="true"></div>
+                <div class="control" id="robot-right" draggable="true"></div>
+                <div class="control" id="robot-down" draggable="true"></div>
             </div>
         </div>
         <canvas id="canvas" width="200px" height="80px"></canvas>
     </section>
+    <footer class="status-display hidden"><span id="status"></span></footer>
 
     <script src="/libs/sprites2v.js"></script>
     <script src="/libs/menus.js"></script>

@@ -19,25 +19,34 @@ body.editor {
             width: 100px;
         }
     }
-    .main .controls button {
-        &#walls {
-            background-image: url('/images/wall.png');
+    .main .controls {
+        &-robot {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
         }
-        &#finish {
-            background-image: url('/images/finish.png');
-        }
-        &#robot {
-            &.right {
-                background-image: url('/images/robot_r.png');
+        .control {
+            &#walls {
+                background-image: url('/images/wall.png');
             }
-            &.left {
-                background-image: url('/images/robot_l.png');
+            &#finish {
+                background-image: url('/images/finish.png');
             }
-            &.up {
-                background-image: url('/images/robot_u.png');
-            }
-            &.down {
-                background-image: url('/images/robot_d.png');
+            &#robot {
+                &.right {
+                    background-image: url('/images/robot_r.png');
+                }
+                &.left {
+                    background-image: url('/images/robot_l.png');
+                }
+                &.up {
+                    background-image: url('/images/robot_u.png');
+                }
+                &.down {
+                    background-image: url('/images/robot_d.png');
+                }
             }
         }
     }

@@ -245,12 +245,14 @@ class Playground {
         this.rows = 0;
         this.columns = 0;
         this.tiles = new ArrayMap();
+        this.arrows = new ArrayMap();
     }
 
     createPlayground(rows, columns, tiles) {
         this.rows = rows;
         this.columns = columns;
-        this.tiles = new ArrayMap();
+        this.tiles.clear();
+        this.arrows.clear();
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         if (this.activity) {
             this.activity.onClick = null;
@@ -274,6 +276,29 @@ class Playground {
 
     get finish() {
         return this.tiles.valuesArray().find((tile) => tile.type === 'finish');
+    }
+
+    addArrow(row, column, dir) {
+        const coord = toCoord({row, column});
+        if (this.arrows.has(coord)) {
+            this.arrows.get(coord).erase();
+        }
+        this.arrows.set(coord, new Arrow(this.activity, row, column, dir));
+    }
+
+    removeArrow(row, column) {
+        const coord = toCoord({row, column});
+        if (this.arrows.has(coord)) {
+            this.arrows.get(coord).erase();
+            this.arrows.delete(coord);
+        }
+        this.activity.paint();
+    }
+
+    clearArrows() {
+        this.arrows.forEach((arrow) => arrow.erase());
+        this.arrows.clear();
+        this.activity.paint();
     }
 
     spriteClicked(tile) {

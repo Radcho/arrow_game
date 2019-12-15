@@ -73,7 +73,7 @@ function attachButtonHandlers() {
     solveButton.addEventListener('click', () => {
         if (playground.tiles.size > 0) {
             solve();
-            clearArrows();
+            playground.clearArrows();
             if (firstSolution) {
                 setStatus('✔');
                 displaySolution();
@@ -89,19 +89,11 @@ function attachButtonHandlers() {
     });
 }
 
-let arrows = [];
-
-function clearArrows() {
-    arrows.forEach((arrow) => arrow.erase());
-    arrows = [];
-    playground.activity.paint();
-}
-
 function displaySolution() {
     firstSolution.forEach((tileInfo, key) => {
         if (tileInfo.arrow) {
             let [row, col] = key.split(',');
-            arrows.push(new Arrow(playground.activity, row, col, tileInfo.arrow));
+            playground.addArrow(row, col, tileInfo.arrow);
         }
     });
 }
