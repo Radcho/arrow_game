@@ -49,6 +49,7 @@ function handleDrop(event) {
         const targetTile = playground.tiles.valuesArray().find((tile) => tile.sprite.isIn(event.offsetX, event.offsetY));
         if (targetTile && targetTile.type === 'tile') {
             playground.addArrow(targetTile.row, targetTile.column, draggedArrow);
+            setStatus('b');
         }
     }
 }
@@ -62,4 +63,7 @@ Playground.prototype.spriteClicked = function (tile) {
         }
     }
     playground.removeArrow(tile.row, tile.column);
+    if (playground.arrows.size === 0) {
+        setStatus('x');
+    }
 }
